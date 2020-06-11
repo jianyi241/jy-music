@@ -1,0 +1,18 @@
+body,div,p,a,ul,ol,li,span,i,table,tr,td,th,input,textarea{
+    margin: 0;
+    padding: 0;
+    /*-webkit-user-select:none;*/
+    /*-moz-user-select:none;*/
+    /*-ms-user-select:none;*/
+    /*user-select:none;*/
+}
+
+a{
+    text-decoration: none;
+}
+
+li{
+    list-style: none;
+}
+
+
