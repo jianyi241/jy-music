@@ -11,25 +11,47 @@
             </ul>
         </div>
         <div class="section">
-            <div>
-                <ul class="music-ul">
-                    <li class="music-item" v-for="(item,index) in musicList" v-show="index < 6" :key="item.id" :class="!!playingMusic && playingMusic.id === item.id ? 'music-on' : ''" @click="playMusic(item, 1, $event)" @dblclick="playMusic(item, 2, $event)">
-                        <span class="cover">
-                            <img :src="item.musicCover" width="40" height="40"/>
-                        </span>
-                        <span class="music-name">{{item.musicName}}</span>
-                        <span class="music-author">{{item.musicAuthor}}</span>
-                        <span class="music-album">{{item.musicAlbum}}</span>
-                        <span class="music-duration">{{formatTime(item.musicDuration)}}</span>
-                        <!-- <span class="music-fiery-degree">
-                            <i class="degree-frame"></i>
-                            <i class="degree-frame-bg" :style="{width: item.musicFieryDegree+'%'}"></i>
-                        </span> -->
-                    </li>
-                </ul>
+            <span class="module-prev" @click="changeRotation('prev')" :style="{top: prevOrNextNum + 'px',left: isShowPrevAndNext ? 0 : '-70px'}"></span>
+            <span class="module-next" @click="changeRotation('next')" :style="{top: prevOrNextNum + 'px',right:isShowPrevAndNext ? 0 : '-70px'}"></span>
+<!--            <div>-->
+<!--                <ul class="music-ul">-->
+<!--                    <li class="music-item" v-for="(item,index) in musicList" v-show="index < 6" :key="item.id" :class="!!playingMusic && playingMusic.id === item.id ? 'music-on' : ''" @click="playMusic(item, 1, $event)" @dblclick="playMusic(item, 2, $event)">-->
+<!--                        <span class="cover">-->
+<!--                            <img :src="item.musicCover" width="40" height="40"/>-->
+<!--                        </span>-->
+<!--                        <span class="music-name">{{item.musicName}}</span>-->
+<!--                        <span class="music-author">{{item.musicAuthor}}</span>-->
+<!--                        <span class="music-album">{{item.musicAlbum}}</span>-->
+<!--                        <span class="music-duration">{{formatTime(item.musicDuration)}}</span>-->
+<!--                        &lt;!&ndash; <span class="music-fiery-degree">-->
+<!--                            <i class="degree-frame"></i>-->
+<!--                            <i class="degree-frame-bg" :style="{width: item.musicFieryDegree+'%'}"></i>-->
+<!--                        </span> &ndash;&gt;-->
+<!--                    </li>-->
+<!--                </ul>-->
+<!--            </div>-->
+            <div class="new-song-module module" @mouseover="showPrevAndNext('newSong')">
+                <div class="song-info">
+                    <p class="song-title">新歌首发</p>
+                    <ul class="song-tabs">
+                        <li class="song-tab" :class="newSongInfo.lan === item.lan ? 'song-tab-on' : ''" v-for="item in newSongInfo.lanlist" :key="item.type" @click="searchNewSong(item.type)">{{item.lan}}</li>
+                    </ul>
+                    <div class="song-content" v-if="!!newSongInfo.songlist[currentNewSongIdx].length && typeof (newSongInfo.songlist[currentNewSongIdx]) != 'undefined'">
+                        <div class="song-card" v-for="item in newSongInfo.songlist[currentNewSongIdx]" :key="item.id">
+                            <img :src="'//y.gtimg.cn/music/photo_new/T002R90x90M000'+item.album.pmid+'.jpg?max_age=2592000'" onerror="this.src='//y.gtimg.cn/mediastyle/global/img/album_300.png?max_age=31536000';this.onerror=null;" class="song-cover">
+                            <p class="song-txt">
+                                <span class="song-name">{{item.title}}</span><br/>
+                                <span class="song-author">{{item.singer[0].name}}</span>
+                            </p>
+                            <p class="song-time">{{formatTime(item.interval)}}</p>
+                        </div>
+                    </div>
+                    <ul class="song-btn-list">
+                        <li class="song-btn" :class="currentNewSongIdx === index ? 'on' : ''" v-for="(item,index) in newSongInfo.songlist" @click="changeRotation(index)"></li>
+                    </ul>
+                </div>
             </div>
-            <div class="mv-module">
-                <span class="mv-prev" @click="changeRotation('mv','prev')"></span>
+            <div class="mv-module module" @mouseover="showPrevAndNext('mv')">
                 <div class="mv-title">
                     <p class="title">
                         <span>M</span>
@@ -52,10 +74,9 @@
                         </li>
                     </ul>
                     <ul class="mv-btn-list">
-                        <li class="mv-btn" :class="currentMVIdx === index ? 'on' : ''" v-for="(item,index) in mvList" @click="changeRotation('mv',index)"></li>
+                        <li class="mv-btn" :class="currentMVIdx === index ? 'on' : ''" v-for="(item,index) in mvList" @click="changeRotation(index)"></li>
                     </ul>
                 </div>
-                <span class="mv-next" @click="changeRotation('mv','next')"></span>
             </div>
         </div>
         <div class="playing-info" v-if="!!playingMusic">
@@ -204,10 +225,25 @@ export default {
             ],
             currentMVIdx: 0,
             currentMVType: 'all',
-            baseUrl: "https://y.qq.com/n/yqq/mv/v/"
+            baseUrl: "https://y.qq.com/n/yqq/mv/v/",
+            newSongInfo: {},
+            prevOrNextNum: 800,
+            isShowPrevAndNext: false,
+            currentLookModule: 'newSong',
+            currentNewSongIdx: 0,
+            currentNewSongPage: 1
         }
     },
     methods: {
+        showPrevAndNext(type) {
+            this.isShowPrevAndNext = true
+            this.currentLookModule = type
+            if (type === 'newSong') {
+                this.prevOrNextNum = 167.5 + 535
+            } else if (type === 'mv') {
+                this.prevOrNextNum = 335 + 535 + +168 + 177.5
+            }
+        },
         goPage(url) {
             window.open(url,'_blank')
         },
@@ -216,8 +252,8 @@ export default {
             this.currentMVType = val
             this.currentMVIdx = 0
         },
-        changeRotation(rotaType, type){
-            if (rotaType === 'mv') {
+        changeRotation(type){
+            if (this.currentLookModule === 'mv') {
                 if (type === 'prev') {
                     if (this.currentMVIdx > 0) {
                         this.currentMVIdx--
@@ -232,6 +268,22 @@ export default {
                     }
                 } else {
                     this.currentMVIdx = type
+                }
+            } else if (this.currentLookModule === 'newSong') {
+                if (type === 'prev') {
+                    if (this.currentNewSongIdx > 0) {
+                        this.currentNewSongIdx--
+                    } else {
+                        this.currentNewSongIdx = this.currentNewSongPage
+                    }
+                } else if (type === 'next') {
+                    if (this.currentNewSongIdx < this.currentNewSongPage) {
+                        this.currentNewSongIdx++
+                    } else {
+                        this.currentNewSongIdx = 0
+                    }
+                } else {
+                    this.currentNewSongIdx = type
                 }
             }
         },
@@ -367,10 +419,58 @@ export default {
                 minute = parseInt(time / 60) > 9 ? parseInt(time / 60) + ':'+(time % 60 > 9 ? time % 60 : '0' + time % 60) : '0' + parseInt(time / 60) + ':' + (time % 60 > 9 ? time % 60 : '0' + time % 60)
             }
             return minute
+        },
+        initHomeData (type='bestNew') {
+            this.currentNewSongIdx = 0
+            let url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom5538560203444538&g_tk=5381&sign=zza1ex6w1f5xksff15c4441255ee9ef959d8dacccc3f88&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22category%22%3A%7B%22method%22%3A%22get_hot_category%22%2C%22param%22%3A%7B%22qq%22%3A%22%22%7D%2C%22module%22%3A%22music.web_category_svr%22%7D%2C%22recomPlaylist%22%3A%7B%22method%22%3A%22get_hot_recommend%22%2C%22param%22%3A%7B%22async%22%3A1%2C%22cmd%22%3A2%7D%2C%22module%22%3A%22playlist.HotRecommendServer%22%7D%2C%22playlist%22%3A%7B%22method%22%3A%22get_playlist_by_category%22%2C%22param%22%3A%7B%22id%22%3A8%2C%22curPage%22%3A1%2C%22size%22%3A40%2C%22order%22%3A5%2C%22titleid%22%3A8%7D%2C%22module%22%3A%22playlist.PlayListPlazaServer%22%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A5%7D%7D%2C%22new_album%22%3A%7B%22module%22%3A%22newalbum.NewAlbumServer%22%2C%22method%22%3A%22get_new_album_info%22%2C%22param%22%3A%7B%22area%22%3A1%2C%22sin%22%3A0%2C%22num%22%3A20%7D%7D%2C%22new_album_tag%22%3A%7B%22module%22%3A%22newalbum.NewAlbumServer%22%2C%22method%22%3A%22get_new_album_area%22%2C%22param%22%3A%7B%7D%7D%2C%22toplist%22%3A%7B%22module%22%3A%22musicToplist.ToplistInfoServer%22%2C%22method%22%3A%22GetAll%22%2C%22param%22%3A%7B%7D%7D%2C%22focus%22%3A%7B%22module%22%3A%22music.musicHall.MusicHallPlatform%22%2C%22method%22%3A%22GetFocus%22%2C%22param%22%3A%7B%7D%7D%7D'
+            this.$api.getDataByUrl({getUrl: url}).then(({data}) => {
+                const {new_song, new_album, new_album_tag, category, focus, playlist, recomPlaylist, toplist} = data
+                let newSongList = []
+                new_song.data.songlist.forEach((item, index) => {
+                    if (index % 9 === 0) {
+                        newSongList.push([])
+                    }
+                    newSongList[parseInt(index / 9)].push(item)
+                })
+                new_song.data.songlist = newSongList
+                this.newSongInfo = new_song.data
+                this.currentNewSongPage = this.newSongInfo.songlist.length
+                console.log(data,"最新音乐",this.newSongInfo)
+            })
+        },
+        searchNewSong (type) {
+            let url = ''
+            if (type === 1) {   //内地
+                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom5221882830103146&g_tk=5381&sign=zza40mrkmn60ddc78a477f842033aa636da25d520ab67&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A1%7D%7D%7D'
+            } else if (type === 6) {    //港台
+                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom22587572293006897&g_tk=5381&sign=zzantdul49tp3kno7970d31e6e0d326e29342cc9403cbb03c&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A6%7D%7D%7D'
+            } else if (type === 2) {    //欧美
+                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom2011294758354496&g_tk=5381&sign=zza4hbix1l0kqylhadad878d3da9f8c4a40b206041d88da9&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A2%7D%7D%7D'
+            } else if (type === 5) {    //最新
+                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom6110692229270864&g_tk=5381&sign=zzaa86z4kj47j7rht9328902d319eb51156c5d99c8c2f3fa8&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A5%7D%7D%7D'
+            } else if (type === 4) {    //韩国
+                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom6729495528402518&g_tk=5381&sign=zzaaeot1895temhzi2dd56eb7022beed1aa33fd2331ec33b89&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A4%7D%7D%7D'
+            } else {    //日本 （3）
+                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom5109107892147629&g_tk=5381&sign=zzaycmg5523ln2rw061af5ab9423c29e9dfccb324859bab45b2&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A3%7D%7D%7D'
+            }
+            this.currentNewSongIdx = 0
+            this.$api.getDataByUrl({getUrl: url}).then(({data}) => {
+                const {new_song} = data
+                let newSongList = []
+                new_song.data.songlist.forEach((item, index) => {
+                    if (index % 9 === 0) {
+                        newSongList.push([])
+                    }
+                    newSongList[parseInt(index / 9)].push(item)
+                })
+                new_song.data.songlist = newSongList
+                this.newSongInfo = new_song.data
+                this.currentNewSongPage = this.newSongInfo.songlist.length
+            })
         }
-
     },
     created() {
+        this.initHomeData()
         this.getMusicList()
         this.loop()
         this.getMusicContent()
@@ -438,22 +538,22 @@ export default {
         }
         .choice{
             position: absolute;
-            width: 256px;
-            height: 36px;
-            top: 380px;
+            width: 276px;
+            height: 4px;
+            top: 420px;
             left: 50%;
             margin-left: -128px;
             box-sizing: border-box;
-            padding: 12px 0;
             .choice-btn{
                 display: inline-block;
-                width: 18px;
-                height: 8px;
+                width: 22px;
+                height: 4px;
                 margin: 0 12px;
                 border-radius: 4px;
                 background-color: @white;
                 cursor: pointer;
                 transition: background-color .1s ease-in-out;
+                vertical-align: top;
                 &:hover{
                     background-color: #23ade5;
                 }
@@ -464,6 +564,30 @@ export default {
         }
     }
     .section{
+        .module-prev,.module-next{
+            position: absolute;
+            width: 70px;
+            height:110px;
+            top: 495px;
+            margin-top: -40px;
+            background: #AAAAAA url("../assets/image/prev.png")  center center/80% no-repeat;
+            opacity: .4;
+            cursor: pointer;
+            z-index: 99;
+            transition: left .2s ease-in-out,right .2s ease-in-out,top .2s ease-in-out;
+            &:hover{
+                opacity: .8;
+            }
+        }
+        .module-prev{
+            left: -70px;
+            transition: left .2s ease-in-out;
+        }
+        .module-next{
+            right: -70px;
+            transform: rotate(180deg);
+            transition: right .2s ease-in-out;
+        }
         .music-ul{
             width: 520px;
             margin: 0 auto;
@@ -516,22 +640,111 @@ export default {
                 box-shadow: 0 0 8px rgba(100, 148, 237, .8);
             }
         }
-        .mv-module{
+        .module{
             position: relative;
             width: 100%;
-            height: 633px;
-            background-color: rgba(238, 238, 255, .8);
             box-sizing: border-box;
             padding: 16px 0;
             overflow: hidden;
-            &:hover{
-                .mv-prev{
-                    left: 0px;
+        }
+        .new-song-module{
+            height: 500px;
+            background-color: rgba(235, 235, 255, .6);
+            >.song-info{
+                height: 100%;
+                width: 1240px;
+                margin: 0 auto;
+                >.song-title{
+                    font-size: 34px;
+                    text-align: center;
+                    letter-spacing: 10px;
                 }
-                .mv-next{
-                    right: 0px;
+                >.song-tabs{
+                    height: 20px;
+                    text-align: center;
+                    margin: 22px 0;
+                    >.song-tab{
+                        display: inline-block;
+                        margin: 0 12px;
+                        transition: color .2s ease-in-out;
+                        cursor: pointer;
+                        &:hover{
+                            color: #1296ff;
+                        }
+                    }
+                    >.song-tab-on{
+                        color: #1296ff;
+                    }
+                }
+                >.song-content{
+                    display: flex;
+                    display: -webkit-flex;
+                    justify-content: space-between;
+                    align-content: space-between;
+                    flex-flow: row wrap;
+                    height: 332px;
+                    overflow: hidden;
+                    >.song-card{
+                        display: flex;
+                        align-content: space-between;
+                        flex-direction: row;
+                        width: 342px;
+                        height: 102px;
+                        background-color: rgba(235, 235, 255, .4);
+                        box-sizing: border-box;
+                        padding-bottom: 11px;
+                        overflow: hidden;
+                        border-bottom: 1px solid rgba(233, 233, 233, .8);
+                        color: #888;
+                        .song-cover{
+                        }
+                        .song-txt{
+                            width: 202px;
+                            height: 90px;
+                            vertical-align: top;
+                            font-size: 14px;
+                            box-sizing: border-box;
+                            padding: 26px 12px;
+                            line-height: 19px;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        }
+                        .song-time{
+                            width: 50px;
+                            height: 100%;
+                            line-height: 90px;
+                        }
+                    }
+                }
+                >.song-btn-list{
+                    position: absolute;
+                    width: 100%;
+                    height: 30px;
+                    line-height: 30px;
+                    left: 0;
+                    bottom: 0;
+                    text-align: center;
+                    .song-btn{
+                        display: inline-block;
+                        width: 10px;
+                        height: 10px;
+                        background-color: rgb(255, 205, 205);
+                        margin: 0 16px;
+                        border-radius: 5px;
+                        transition: background-color .1s ease-in-out;
+                        cursor: pointer;
+                    }
+                    .on{
+                        width: 24px;
+                        background-color: #1296ff;
+                    }
                 }
             }
+        }
+        .mv-module{
+            height: 633px;
+            background-color: rgba(238, 238, 255, .6);
             .mv-title{
                 .title{
                     font-size: 34px;
@@ -552,28 +765,6 @@ export default {
                         color: #1296ff;
                     }
                 }
-            }
-            .mv-prev,.mv-next{
-                position: absolute;
-                width: 70px;
-                height:110px;
-                top: 50%;
-                margin-top: -40px;
-                background: #AAAAAA url("../assets/image/prev.png")  center center/80% no-repeat;
-                opacity: .4;
-                cursor: pointer;
-                &:hover{
-                    opacity: .8;
-                }
-            }
-            .mv-prev{
-                left: -70px;
-                transition: left .2s ease-in-out;
-            }
-            .mv-next{
-                right: -70px;
-                transform: rotate(180deg);
-                transition: right .2s ease-in-out;
             }
             .mv-content{
                 position: relative;
@@ -609,28 +800,26 @@ export default {
                             overflow: hidden;
                             cursor: pointer;
                             &:hover{
-                                img {
+                                >img {
                                     transform: scale(1.1);
                                 }
                                 .play-mv{
-                                    z-index: 1;
-                                    transform: scale(1.3);
+                                    opacity: 1;
                                 }
                             }
                             .play-mv{
-                                display: inline-block;
-                                width: 40px;
-                                height: 40px;
                                 position: absolute;
-                                left: 0;
-                                top: 0;
-                                right: 0;
-                                bottom: 0;
+                                width: 50px;
+                                height: 50px;
+                                left: 50%;
+                                top: 50%;
+                                transform: translate(-50%,-50%);
                                 margin: auto;
                                 background: #FFF url("../assets/image/cover_play.png") center center/100% no-repeat;
                                 border-radius: 50%;
-                                z-index: -1;
-                                transition: transform .2s ease-in-out;
+                                opacity: 0;
+                                z-index: 99;
+                                transition: opacity .2s ease-in-out;
                             }
                             img{
                                 transition: transform .2s ease-in-out;

@@ -61,7 +61,7 @@ module.exports = {
     /* 使用代理 */
     proxy: {
       '/api': {
-        target: 'http://192.168.120.1:6060/SimpleMusic',
+        target: 'http://192.168.1.54:4040/simple-music-api',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
