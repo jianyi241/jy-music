@@ -37,7 +37,7 @@
                         <li class="song-tab" :class="newSongInfo.lan === item.lan ? 'song-tab-on' : ''" v-for="item in newSongInfo.lanlist" :key="item.type" @click="searchNewSong(item.type)">{{item.lan}}</li>
                     </ul>
                     <div class="song-content" v-if="!!newSongInfo.songlist[currentNewSongIdx].length && typeof (newSongInfo.songlist[currentNewSongIdx]) != 'undefined'">
-                        <div class="song-card" v-for="item in newSongInfo.songlist[currentNewSongIdx]" :key="item.id">
+                        <div class="song-card" v-for="item in newSongInfo.songlist[currentNewSongIdx]" :key="item.id" @click="goPage('https://y.qq.com/n/yqq/album/'+item.album.mid+'.html')">
                             <img :src="'//y.gtimg.cn/music/photo_new/T002R90x90M000'+item.album.pmid+'.jpg?max_age=2592000'" onerror="this.src='//y.gtimg.cn/mediastyle/global/img/album_300.png?max_age=31536000';this.onerror=null;" class="song-cover">
                             <p class="song-txt">
                                 <span class="song-name">{{item.title}}</span><br/>
