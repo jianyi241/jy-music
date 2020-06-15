@@ -30,7 +30,31 @@
 <!--                    </li>-->
 <!--                </ul>-->
 <!--            </div>-->
-            <div class="new-song-module module" @mouseover="showPrevAndNext('newSong')">
+            <div class="song-recom-module module" :class="currentLookModule === 'songRecom' ? 'current-module-bg' : ''" @mouseover="showPrevAndNext('songRecom')">
+                <div class="recom-info">
+                    <p class="recom-title">歌单推荐</p>
+                    <ul class="recom-tabs">
+                        <li class="recom-tab" :class="currentRecomType === item.type ? 'on' : ''" v-for="item in recomTabs" :key="item.type" @click="searchRecomSong(item.type)">{{item.name}}</li>
+                    </ul>
+                    <div class="recom-content">
+                        <ul class="recom-list">
+                            <li class="recom-card" v-for="item in recomPlayList[currentRecomSongIdx]" :key="item.content_id">
+                                <p class="recom-card-cover" @click="goPage('https://y.qq.com/n/yqq/playsquare/'+item.content_id+'.html#stat=y_new.index.playlist.pic')">
+                                    <img :src="item.cover || item.cover_url_big" width="235" height="235"/>
+                                    <i class="cover-mask"></i>
+                                    <i class="recom-play play-song"></i>
+                                </p>
+                                <span class="recom-card-title" :title="item.title">{{item.title}}</span>
+                                <span class="recom-play-count" :title="'播放量'+parseInt((item.listen_num || item.access_num)/10000).toFixed(1)+'万'">播放量：{{(parseInt(item.listen_num || item.access_num)/10000).toFixed(1)}}万</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <ul class="recom-btn-list choice-btn-list">
+                        <li class="recom-btn choice-btn" :class="currentRecomSongIdx === index ? 'on' : ''" v-for="(item,index) in recomPlayList" :key="item.content_id" @click="changeRotation(index)"></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="new-song-module module" :class="currentLookModule === 'newSong' ? 'current-module-bg' : ''" @mouseover="showPrevAndNext('newSong')">
                 <div class="song-info">
                     <p class="song-title">新歌首发</p>
                     <ul class="song-tabs">
@@ -46,12 +70,12 @@
                             <p class="song-time">{{formatTime(item.interval)}}</p>
                         </div>
                     </div>
-                    <ul class="song-btn-list">
-                        <li class="song-btn" :class="currentNewSongIdx === index ? 'on' : ''" v-for="(item,index) in newSongInfo.songlist" @click="changeRotation(index)"></li>
+                    <ul class="song-btn-list choice-btn-list">
+                        <li class="song-btn choice-btn" :class="currentNewSongIdx === index ? 'on' : ''" v-for="(item,index) in newSongInfo.songlist" :key="item.id" @click="changeRotation(index)"></li>
                     </ul>
                 </div>
             </div>
-            <div class="mv-module module" @mouseover="showPrevAndNext('mv')">
+            <div class="mv-module module" :class="currentLookModule === 'mv' ? 'current-module-bg' : ''" @mouseover="showPrevAndNext('mv')">
                 <div class="mv-title">
                     <p class="title">
                         <span>M</span>
@@ -65,7 +89,7 @@
                     <ul class="mv-list">
                         <li class="mv-item" v-for="(item,index) in mvList[currentMVIdx]" :key="item.mv_id">
                             <span class="mv-cover">
-                                <i class="play-mv" @click="goPage(baseUrl+item.vid+'.html')"></i>
+                                <i class="play-mv play-song" @click="goPage(baseUrl+item.vid+'.html')"></i>
                                 <img :src="item.picurl" width="224" height="126" @click="goPage(baseUrl+item.vid+'.html')"/>
                             </span>
                             <span class="mv-title" :title="item.mvtitle" @click="goPage(baseUrl+item.vid+'.html')">{{item.mvtitle}}</span>
@@ -75,6 +99,34 @@
                     </ul>
                     <ul class="mv-btn-list">
                         <li class="mv-btn" :class="currentMVIdx === index ? 'on' : ''" v-for="(item,index) in mvList" @click="changeRotation(index)"></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="new-album-module module" :class="currentLookModule === 'newAlbum' ? 'current-module-bg' : ''" @mouseover="showPrevAndNext('newAlbum')">
+                <div class="new-album-info">
+                    <p class="album-title">新碟首发</p>
+                    <ul class="album-tabs">
+                        <li class="album-tab" :class="currentNewAlbumType === item.type ? 'on' : ''" v-for="item in newAlbumType" :key="item.type" @click="searchAlbumSong(item.type)">{{item.name}}</li>
+                    </ul>
+                    <div class="album-content">
+                        <ul class="album-list">
+                            <li class="album-card" v-for="item in newAlbumList[currentNewAlbumIdx]" :key="item.id">
+                                <p class="album-cover" @click="goPage('https://y.qq.com/n/yqq/album/'+item.mid+'.html#stat=y_new.index.album.albumpic')">
+                                    <img :src="'//y.gtimg.cn/music/photo_new/T002R300x300M000'+item.photo.pic_mid+'.jpg?max_age=2592000'" width="224" height="224"/>
+                                    <i class="cover-mask"></i>
+                                    <i class="album-play play-song"></i>
+                                </p>
+                                <span class="album-card-title" @click="goPage('https://y.qq.com/n/yqq/album/'+item.mid+'.html#stat=y_new.index.album.albumpic')">{{item.name}}</span>
+                                <span class="album-card-author" @click="goPage('https://y.qq.com/n/yqq/album/'+item.mid+'.html#stat=y_new.index.album.albumpic')">
+                                    <i v-for="(_item, index) in item.singers" :key="_item.id" @click="goPage('https://y.qq.com/n/yqq/singer/'+_item.mid+'.html#stat=y_new.index.album.singername')">
+                                        {{_item.name}}
+                                    </i>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <ul class="new-album-btn-list choice-btn-list">
+                        <li class="new-album-btn choice-btn" :class="currentNewAlbumIdx === index ? 'on' : ''" v-for="(item, index) in newAlbumList" :key="index" @click="changeRotation(index)"></li>
                     </ul>
                 </div>
             </div>
@@ -225,23 +277,91 @@ export default {
             ],
             currentMVIdx: 0,
             currentMVType: 'all',
-            baseUrl: "https://y.qq.com/n/yqq/mv/v/",
-            newSongInfo: {},
+            baseUrl: 'https://y.qq.com/n/yqq/mv/v/',
+            newSongInfo: {
+                lan: '最新',
+                lanlist: [],
+                ret_msg: 'success!',
+                songlist: [{
+                    type: ''
+                }],
+                type: 5,
+            },
             prevOrNextNum: 800,
             isShowPrevAndNext: false,
             currentLookModule: 'newSong',
             currentNewSongIdx: 0,
-            currentNewSongPage: 1
+            currentNewSongPage: 1,
+            recomPlayList: [],
+            recomTabs: [
+                {
+                    type: 0,
+                    name: '为你推荐'
+                },{
+                    type: 1,
+                    name: '官方歌单'
+                },{
+                    type: 2,
+                    name: '情歌'
+                },{
+                    type: 3,
+                    name: '网络歌曲'
+                },{
+                    type: 4,
+                    name: '经典'
+                },{
+                    type: 5,
+                    name: 'KTV热歌'
+                }
+            ],
+            currentRecomSongIdx: 0,
+            recomSongPage: 0,
+            currentRecomType: 0,
+            newAlbumList: [],
+            newAlbumType: [
+                {
+                    type: 1,
+                    name: '内地'
+                },{
+                    type: 2,
+                    name: '港台'
+                },{
+                    type: 3,
+                    name: '欧美'
+                },{
+                    type: 4,
+                    name: '韩国'
+                },{
+                    type: 5,
+                    name: '日本'
+                },{
+                    type: 6,
+                    name: '其它'
+                }
+            ],
+            currentNewAlbumType: 1,
+            currentNewAlbumIdx: 0,
+            currentNewAlbumPage: 0
         }
     },
     methods: {
+        filterSingers (val) {
+            let singers = val.map(item => {
+                return item.name
+            })
+            return singers
+        },
         showPrevAndNext(type) {
             this.isShowPrevAndNext = true
             this.currentLookModule = type
-            if (type === 'newSong') {
+            if (type === 'songRecom') {
                 this.prevOrNextNum = 167.5 + 535
+            } else if (type === 'newSong') {
+                this.prevOrNextNum = 1210
             } else if (type === 'mv') {
-                this.prevOrNextNum = 335 + 535 + +168 + 177.5
+                this.prevOrNextNum = 1790
+            } else if (type === 'newAlbum') {
+                this.prevOrNextNum = 2506
             }
         },
         goPage(url) {
@@ -284,6 +404,38 @@ export default {
                     }
                 } else {
                     this.currentNewSongIdx = type
+                }
+            } else if (this.currentLookModule === 'songRecom') {
+                if (type === 'prev') {
+                    if (this.currentRecomSongIdx > 0) {
+                        this.currentRecomSongIdx--
+                    } else {
+                        this.currentRecomSongIdx = this.recomSongPage - 1
+                    }
+                } else if (type === 'next') {
+                    if (this.currentRecomSongIdx < this.recomSongPage -1) {
+                        this.currentRecomSongIdx++
+                    } else {
+                        this.currentRecomSongIdx = 0
+                    }
+                } else {
+                    this.currentRecomSongIdx = type
+                }
+            } else if (this.currentLookModule === 'newAlbum') {
+                if (type === 'prev') {
+                    if (this.currentNewAlbumIdx > 0) {
+                        this.currentNewAlbumIdx--
+                    } else {
+                        this.currentNewAlbumIdx = this.currentNewAlbumPage - 1
+                    }
+                } else if (type === 'next') {
+                    if (this.currentNewAlbumIdx < this.currentNewAlbumPage -1) {
+                        this.currentNewAlbumIdx++
+                    } else {
+                        this.currentNewAlbumIdx = 0
+                    }
+                } else {
+                    this.currentNewAlbumIdx = type
                 }
             }
         },
@@ -397,13 +549,13 @@ export default {
             let url = `https://c.y.qq.com/mv/fcgi-bin/getmv_by_tag?g_tk_new_20200303=5381&g_tk=5381&loginUin=2500667233&hostUin=0&format=json&inCharset=utf8&outCharset=GB2312&notice=0&platform=yqq.json&needNewCode=0&cmd=shoubo&lan=${type}`
             this.$api.getDataByUrl({getUrl: url}).then(res => {
                 let result = [[],[],[],[],[]]
-                console.log("请求道的mv列表",result)
+                // console.log("请求道的mv列表",result)
                 // this.mvList = result.mvlist
                 JSON.parse(`${res.data}}`).data.mvlist.forEach((item,index) => {
                     result[parseInt(index / 10)].push(item)
                 })
                 this.mvList = result
-                console.log(this.mvList,"MVLIST")
+                // console.log(this.mvList,"MVLIST")
             })
         },
         getMusicContent() {
@@ -425,36 +577,42 @@ export default {
             let url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom5538560203444538&g_tk=5381&sign=zza1ex6w1f5xksff15c4441255ee9ef959d8dacccc3f88&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22category%22%3A%7B%22method%22%3A%22get_hot_category%22%2C%22param%22%3A%7B%22qq%22%3A%22%22%7D%2C%22module%22%3A%22music.web_category_svr%22%7D%2C%22recomPlaylist%22%3A%7B%22method%22%3A%22get_hot_recommend%22%2C%22param%22%3A%7B%22async%22%3A1%2C%22cmd%22%3A2%7D%2C%22module%22%3A%22playlist.HotRecommendServer%22%7D%2C%22playlist%22%3A%7B%22method%22%3A%22get_playlist_by_category%22%2C%22param%22%3A%7B%22id%22%3A8%2C%22curPage%22%3A1%2C%22size%22%3A40%2C%22order%22%3A5%2C%22titleid%22%3A8%7D%2C%22module%22%3A%22playlist.PlayListPlazaServer%22%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A5%7D%7D%2C%22new_album%22%3A%7B%22module%22%3A%22newalbum.NewAlbumServer%22%2C%22method%22%3A%22get_new_album_info%22%2C%22param%22%3A%7B%22area%22%3A1%2C%22sin%22%3A0%2C%22num%22%3A20%7D%7D%2C%22new_album_tag%22%3A%7B%22module%22%3A%22newalbum.NewAlbumServer%22%2C%22method%22%3A%22get_new_album_area%22%2C%22param%22%3A%7B%7D%7D%2C%22toplist%22%3A%7B%22module%22%3A%22musicToplist.ToplistInfoServer%22%2C%22method%22%3A%22GetAll%22%2C%22param%22%3A%7B%7D%7D%2C%22focus%22%3A%7B%22module%22%3A%22music.musicHall.MusicHallPlatform%22%2C%22method%22%3A%22GetFocus%22%2C%22param%22%3A%7B%7D%7D%7D'
             this.$api.getDataByUrl({getUrl: url}).then(({data}) => {
                 const {new_song, new_album, new_album_tag, category, focus, playlist, recomPlaylist, toplist} = data
+                //新歌首发 列表数据
                 let newSongList = []
+                //歌单推荐 列表数据
+                let recomList = []
                 new_song.data.songlist.forEach((item, index) => {
                     if (index % 9 === 0) {
                         newSongList.push([])
                     }
                     newSongList[parseInt(index / 9)].push(item)
                 })
+                recomPlaylist.data.v_hot.forEach((item,index) => {
+                    if (index % 5 === 0) {
+                        recomList.push([])
+                    }
+                    recomList[parseInt(index / 5)].push(item)
+                })
                 new_song.data.songlist = newSongList
-                this.newSongInfo = new_song.data
-                this.currentNewSongPage = this.newSongInfo.songlist.length
-                console.log(data,"最新音乐",this.newSongInfo)
+                this.newSongInfo = new_song.data    //新歌首发
+                this.currentNewSongPage = this.newSongInfo.songlist.length  //当前新歌页数
+                this.recomPlayList = recomList  //歌单推荐
+                this.recomSongPage = recomList.length   //歌单推荐页数
+
+                this.newAlbumList = []
+                new_album.data.albums.forEach((item, index) => {
+                    if (index % 10 === 0) {
+                        this.newAlbumList.push([])
+                    }
+                    this.newAlbumList[parseInt(index / 10)].push(item)
+                })
+                this.currentNewAlbumPage = this.newAlbumList.length
+                console.log(this.newAlbumList, '新碟推荐数据')
             })
         },
         searchNewSong (type) {
-            let url = ''
-            if (type === 1) {   //内地
-                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom5221882830103146&g_tk=5381&sign=zza40mrkmn60ddc78a477f842033aa636da25d520ab67&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A1%7D%7D%7D'
-            } else if (type === 6) {    //港台
-                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom22587572293006897&g_tk=5381&sign=zzantdul49tp3kno7970d31e6e0d326e29342cc9403cbb03c&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A6%7D%7D%7D'
-            } else if (type === 2) {    //欧美
-                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom2011294758354496&g_tk=5381&sign=zza4hbix1l0kqylhadad878d3da9f8c4a40b206041d88da9&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A2%7D%7D%7D'
-            } else if (type === 5) {    //最新
-                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom6110692229270864&g_tk=5381&sign=zzaa86z4kj47j7rht9328902d319eb51156c5d99c8c2f3fa8&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A5%7D%7D%7D'
-            } else if (type === 4) {    //韩国
-                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom6729495528402518&g_tk=5381&sign=zzaaeot1895temhzi2dd56eb7022beed1aa33fd2331ec33b89&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A4%7D%7D%7D'
-            } else {    //日本 （3）
-                url = 'https://u.y.qq.com/cgi-bin/musics.fcg?-=recom5109107892147629&g_tk=5381&sign=zzaycmg5523ln2rw061af5ab9423c29e9dfccb324859bab45b2&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A3%7D%7D%7D'
-            }
             this.currentNewSongIdx = 0
-            this.$api.getDataByUrl({getUrl: url}).then(({data}) => {
+            this.$api.getNewSongList(type).then(({data}) => {
                 const {new_song} = data
                 let newSongList = []
                 new_song.data.songlist.forEach((item, index) => {
@@ -466,6 +624,42 @@ export default {
                 new_song.data.songlist = newSongList
                 this.newSongInfo = new_song.data
                 this.currentNewSongPage = this.newSongInfo.songlist.length
+            })
+        },
+        searchRecomSong (type) {
+            this.currentRecomSongIdx = 0
+            this.currentRecomType = type
+            this.$api.getRecomSongList(type).then(({data}) => {
+                // console.log(res.data.recomPlaylist.data.v_hot, 'recomPalyList')
+                let recomList = []
+                let recomData = []
+                if (type === 0) {
+                    recomData = data.recomPlaylist.data.v_hot
+                } else {
+                    recomData = data.playlist.data.v_playlist
+                }
+                recomData.forEach((item,index) => {
+                    if (index % 5 === 0) {
+                        recomList.push([])
+                    }
+                    recomList[parseInt(index / 5)].push(item)
+                })
+                this.recomPlayList = recomList
+                this.recomSongPage = recomList.length
+            })
+        },
+        searchAlbumSong (type) {
+            this.currentNewAlbumIdx = 0
+            this.currentNewAlbumType = type
+            this.$api.getAlbumSongList(type).then(({data}) => {
+                this.newAlbumList = []
+                data.new_album.data.albums.forEach((item, index) => {
+                    if (index % 10 === 0) {
+                        this.newAlbumList.push([])
+                    }
+                    this.newAlbumList[parseInt(index / 10)].push(item)
+                })
+                this.currentNewAlbumPage = this.newAlbumList.length
             })
         }
     },
@@ -574,19 +768,52 @@ export default {
             opacity: .4;
             cursor: pointer;
             z-index: 99;
-            transition: left .2s ease-in-out,right .2s ease-in-out,top .2s ease-in-out;
+            transition: top .2s ease-in-out;
             &:hover{
                 opacity: .8;
             }
         }
         .module-prev{
             left: -70px;
-            transition: left .2s ease-in-out;
         }
         .module-next{
             right: -70px;
             transform: rotate(180deg);
-            transition: right .2s ease-in-out;
+        }
+        .play-song{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            margin: auto;
+            background: #FFF url("../assets/image/cover_play.png") center center/100% no-repeat;
+            border-radius: 50%;
+            opacity: 0;
+            z-index: 99;
+            transition: opacity .2s ease-in-out;
+        }
+        .choice-btn-list{
+            position: absolute;
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            left: 0;
+            bottom: 0;
+            text-align: center;
+            margin: 16px 0;
+            >.choice-btn{
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                background-color: #FFF;
+                margin: 0 16px;
+                border-radius: 5px;
+                transition: background-color .1s ease-in-out;
+                cursor: pointer;
+            }
+            .on{
+                background-color: #1296ff;
+            }
         }
         .music-ul{
             width: 520px;
@@ -647,9 +874,115 @@ export default {
             padding: 16px 0;
             overflow: hidden;
         }
+        .current-module-bg{
+            background-color: rgba(238, 238, 255, 0.6);
+        }
+        >.song-recom-module{
+            height: 468px;
+            >.recom-info{
+                width: 1240px;
+                height: 100%;
+                margin: 0 auto;
+                >.recom-title{
+                    font-size: 34px;
+                    text-align: center;
+                    letter-spacing: 10px;
+                }
+                >.recom-tabs{
+                    height: 26px;
+                    line-height: 26px;
+                    text-align: center;
+                    margin: 22px 0;
+                    >.recom-tab{
+                        display: inline-block;
+                        margin: 0 16px;
+                        cursor: pointer;
+                        &:hover{
+                            color: #1296ff;
+                        }
+                    }
+                    >.on{
+                        color: #1296ff;
+                    }
+                }
+                >.recom-content .recom-list{
+                    display: flex;
+                    justify-content: space-between;
+                    align-content: space-between;
+                    >.recom-card{
+                        width: 235px;
+                        height: 295px;
+                        >span{
+                            display: block;
+                            height: 26px;
+                            width: 90%;
+                            line-height: 26px;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                            font-size: 14px;
+                            cursor: pointer;
+                        }
+                        >.recom-card-cover{
+                            position: relative;
+                            width: 235px;
+                            height: 235px;
+                            cursor: pointer;
+                            overflow: hidden;
+                            >img{
+                                transition: transform .2s ease-in-out;
+                            }
+                            &:hover{
+                                >.cover-mask{
+                                    opacity: 1;
+                                }
+                                >.recom-play{
+                                    opacity: 1;
+                                }
+                                >img{
+                                    transform: scale(1.1);
+                                }
+                            }
+                            >.cover-mask{
+                                position: absolute;
+                                display: block;
+                                width: 100%;
+                                height: 100%;
+                                top: 0;
+                                left: 0;
+                                background-color: rgba(0, 0, 0, .2);
+                                opacity: 0;
+                                transition: opacity .2s ease-in-out;
+                            }
+                            >.recom-play{
+                                width: 80px;
+                                height: 80px;
+                            }
+                        }
+                        >.recom-card-title{
+                            margin-top: 8px;
+                            color: #222;
+                            transition: color .2s ease;
+                            &:hover{
+                                color: #1296ff;
+                            }
+                        }
+                        >.recom-play-count{
+                            color: #999;
+                        }
+                    }
+                }
+                >.recom-btn-list{
+                    .recom-btn{
+                    }
+                    .on{
+                        background-color: #1296ff;
+                    }
+                }
+            }
+        }
         .new-song-module{
-            height: 500px;
-            background-color: rgba(235, 235, 255, .6);
+            height: 526px;
             >.song-info{
                 height: 100%;
                 width: 1240px;
@@ -665,7 +998,7 @@ export default {
                     margin: 22px 0;
                     >.song-tab{
                         display: inline-block;
-                        margin: 0 12px;
+                        margin: 0 16px;
                         transition: color .2s ease-in-out;
                         cursor: pointer;
                         &:hover{
@@ -690,7 +1023,7 @@ export default {
                         flex-direction: row;
                         width: 342px;
                         height: 102px;
-                        background-color: rgba(235, 235, 255, .4);
+                        background-color: rgba(255, 255, 255, .8);
                         box-sizing: border-box;
                         padding-bottom: 11px;
                         overflow: hidden;
@@ -718,25 +1051,9 @@ export default {
                     }
                 }
                 >.song-btn-list{
-                    position: absolute;
-                    width: 100%;
-                    height: 30px;
-                    line-height: 30px;
-                    left: 0;
-                    bottom: 0;
-                    text-align: center;
                     .song-btn{
-                        display: inline-block;
-                        width: 10px;
-                        height: 10px;
-                        background-color: rgb(255, 205, 205);
-                        margin: 0 16px;
-                        border-radius: 5px;
-                        transition: background-color .1s ease-in-out;
-                        cursor: pointer;
                     }
                     .on{
-                        width: 24px;
                         background-color: #1296ff;
                     }
                 }
@@ -744,18 +1061,17 @@ export default {
         }
         .mv-module{
             height: 633px;
-            background-color: rgba(238, 238, 255, .6);
             .mv-title{
                 .title{
                     font-size: 34px;
                     text-align: center;
                 }
                 .mv-type{
-                    margin: 16px 0 30px 0;
+                    margin: 22px 0;
                     text-align: center;
-                    li{
+                    >li{
                         display: inline-block;
-                        margin-right: 42px;
+                        margin: 0 16px;
                         cursor: pointer;
                         &:hover{
                             color: #1296ff;
@@ -793,7 +1109,7 @@ export default {
                             color: #999;
                             transition: color .1s ease-in-out;
                         }
-                        .mv-cover{
+                        >.mv-cover{
                             position: relative;
                             width: 224px;
                             height: 126px;
@@ -808,20 +1124,10 @@ export default {
                                 }
                             }
                             .play-mv{
-                                position: absolute;
                                 width: 50px;
                                 height: 50px;
-                                left: 50%;
-                                top: 50%;
-                                transform: translate(-50%,-50%);
-                                margin: auto;
-                                background: #FFF url("../assets/image/cover_play.png") center center/100% no-repeat;
-                                border-radius: 50%;
-                                opacity: 0;
-                                z-index: 99;
-                                transition: opacity .2s ease-in-out;
                             }
-                            img{
+                            >img{
                                 transition: transform .2s ease-in-out;
                             }
                         }
@@ -831,9 +1137,10 @@ export default {
                                 color: #1296ff;
                             }
                         }
-                        .mv-title{
+                        >.mv-title{
                             color: #000;
                             cursor: pointer;
+                            margin-top: 8px;
                             &:hover{
                                 color: #1296ff;
                             }
@@ -871,8 +1178,95 @@ export default {
                         cursor: pointer;
                     }
                     .on{
-                        width: 24px;
                         background-color: #1296ff;
+                    }
+                }
+            }
+        }
+        .new-album-module{
+            height: 800px;
+            .new-album-info{
+                position: relative;
+                width: 1240px;
+                height: 100%;
+                margin: 0 auto;
+                .album-title{
+                    font-size: 34px;
+                    letter-spacing: 10px;
+                    text-align: center;
+                }
+                .album-tabs{
+                    margin: 22px 0;
+                    text-align: center;
+                    >.album-tab{
+                        display: inline-block;
+                        margin: 0 16px;
+                        cursor: pointer;
+                        &:hover{
+                            color: #1296ff;
+                        }
+                    }
+                    >.on{
+                        color: #1296ff;
+                    }
+                }
+                .album-content .album-list{
+                    display: flex;
+                    width: 100%;
+                    height: 596px;
+                    justify-content: space-between;
+                    align-content: space-between;
+                    flex-flow: wrap;
+                    .album-card{
+                        width: 224px;
+                        height: 276px;
+                        .album-cover{
+                            position: relative;
+                            width: 224px;
+                            height: 224px;
+                            overflow: hidden;
+                            >img{
+                                transition: transform .2s ease-in-out;
+                            }
+                            .album-play{
+                                width: 60px;
+                                height: 60px;
+                            }
+                            &:hover{
+                                .album-play{
+                                    opacity: 1;
+                                }
+                                >img{
+                                    transform: scale(1.2);
+                                }
+                            }
+                        }
+                        >span{
+                            display: block;
+                            height: 26px;
+                            line-height: 26px;
+                            font-size: 14px;
+                        }
+                        .album-card-title{
+                            color: #222;
+                            margin-top: 8px;
+                            transition: color .2s ease-in-out;
+                            cursor: pointer;
+                            &:hover{
+                                color: #1296ff;
+                            }
+                        }
+                        .album-card-author{
+                            color: #999;
+                            transition: color .2s ease-in-out;
+                            >i{
+                                font-style: normal;
+                                cursor: pointer;
+                                &:hover{
+                                    color: #23ade5;
+                                }
+                            }
+                        }
                     }
                 }
             }
