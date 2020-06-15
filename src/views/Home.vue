@@ -675,7 +675,7 @@ export default {
 
 <style lang="less" scoped>
 @blue: #23ade5;
-@white: rgb(247, 238, 214);
+@white: #EEF;
 .home{
     width: 100%;
     .loop{
@@ -805,7 +805,7 @@ export default {
                 display: inline-block;
                 width: 10px;
                 height: 10px;
-                background-color: #FFF;
+                background-color: rgb(150, 195, 255);
                 margin: 0 16px;
                 border-radius: 5px;
                 transition: background-color .1s ease-in-out;
@@ -884,7 +884,7 @@ export default {
                 height: 100%;
                 margin: 0 auto;
                 >.recom-title{
-                    font-size: 34px;
+                    font-size: 32px;
                     text-align: center;
                     letter-spacing: 10px;
                 }
@@ -988,7 +988,7 @@ export default {
                 width: 1240px;
                 margin: 0 auto;
                 >.song-title{
-                    font-size: 34px;
+                    font-size: 32px;
                     text-align: center;
                     letter-spacing: 10px;
                 }
@@ -1029,7 +1029,8 @@ export default {
                         overflow: hidden;
                         border-bottom: 1px solid rgba(233, 233, 233, .8);
                         color: #888;
-                        .song-cover{
+                        >.song-cover{
+                            cursor: pointer;
                         }
                         .song-txt{
                             width: 202px;
@@ -1063,7 +1064,7 @@ export default {
             height: 633px;
             .mv-title{
                 .title{
-                    font-size: 34px;
+                    font-size: 32px;
                     text-align: center;
                 }
                 .mv-type{
@@ -1191,7 +1192,7 @@ export default {
                 height: 100%;
                 margin: 0 auto;
                 .album-title{
-                    font-size: 34px;
+                    font-size: 32px;
                     letter-spacing: 10px;
                     text-align: center;
                 }
@@ -1246,6 +1247,9 @@ export default {
                             height: 26px;
                             line-height: 26px;
                             font-size: 14px;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
                         }
                         .album-card-title{
                             color: #222;
