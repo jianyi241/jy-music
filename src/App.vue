@@ -6,7 +6,6 @@
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-    padding-bottom: 200px;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 </style>

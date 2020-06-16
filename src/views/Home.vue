@@ -106,7 +106,7 @@
                 <div class="new-album-info">
                     <p class="album-title">新碟首发</p>
                     <ul class="album-tabs">
-                        <li class="album-tab" :class="currentNewAlbumType === item.type ? 'on' : ''" v-for="item in newAlbumType" :key="item.type" @click="searchAlbumSong(item.type)">{{item.name}}</li>
+                        <li class="album-tab" :class="currentNewAlbumType === item.id ? 'on' : ''" v-for="item in newAlbumType" :key="item.id" @click="searchAlbumSong(item.id)">{{item.name}}</li>
                     </ul>
                     <div class="album-content">
                         <ul class="album-list">
@@ -130,7 +130,62 @@
                     </ul>
                 </div>
             </div>
+            <div class="ranking-module module" :class="currentLookModule === 'ranking' ? 'current-module-bg' : ''" @mouseover="showPrevAndNext('ranking')">
+                <div class="ranking-info">
+                    <p class="ranking-title">排行榜</p>
+                    <ul class="ranking-list">
+                        <li class="ranking-card" :class="'card-bg-'+(index+1)" v-for="(item, index) in rankingList[0].toplist.slice(1,6)" :key="item.topId">
+                            <div class="ranking-content">
+                                <div class="ranking-card-title">
+                                    <p class="card-title1">{{rankingList[0].groupName}}</p>
+                                    <p class="card-title2" @click="goPage('https://y.qq.com/n/yqq/toplist/'+item.topId+'.html#stat=y_new.index.toplist.detail.'+item.topId+'')">{{item.musichallTitle.substring(0,item.musichallTitle.length-1)}}</p>
+                                </div>
+                                <div class="ranking-card-play">
+                                    <i class="card-play-btn"></i>
+                                </div>
+                                <div class="ranking-card-ul">
+                                    <ul class="ranking-card-list">
+                                        <li class="card-list-item" v-for="(_item, index) in item.song">
+                                            <i class="num">{{index + 1}}</i>
+                                            <p class="item-txt">
+                                                <span @click="goPage('https://y.qq.com/n/yqq/song/'+_item.songId+'_num.html#stat=y_new.index.toplist.songname')">{{_item.title}}</span>
+                                                <span @click="goPage('https://y.qq.com/n/yqq/singer/'+_item.singerMid+'.html#stat=y_new.index.toplist.singername')">{{_item.singerName}}</span>
+                                            </p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
+        <footer>
+            <div class="home-footer">
+                <div class="footer-info">
+                    <div class="footer-download">
+                        <p class="download-title">下载简逸音乐客户端</p>
+                        <ul class="download-ul">
+                            <li class="download-item" @click="goPage('www.baidu.com')">
+                                <i class="icon win-icon"></i>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="footer-nav">
+                        <ul class="footer-nav-ul">
+                            <li class="nav-item" v-for="item in navList" :key="item.id">
+                                <a :href="item.url" target="_blank">{{item.name}}</a><em style="margin: 0 6px">|</em>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="copy-right">
+
+                        <p>Copyright © 1998 - 2020 Simple. All Rights Reserved.<br/>
+                            简逸公司 版权所有 简逸网络文化经营许可证（本站纯属娱乐）</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
         <div class="playing-info" v-if="!!playingMusic">
             <span class="curr-cover" ref="curr-cover" :class="playingMusic.isPlay ? 'rotate-cover' : ''">
                 <img :src="playingMusic.musicCover" width="52" height="52"/>
@@ -143,7 +198,6 @@
             <span class="play-time">{{formatTime(playingMusic.musicDuration)}}</span>
             <audio ref="audio" :src="playingMusic.musicUrl" autoplay loop @timeupdate="durationChange" @playing="play()" @seeking="seeking()" @seeked="seeked"></audio>
         </div>
-
     </div>
 </template>
 
@@ -165,6 +219,53 @@ export default {
     },
     data() {
         return {
+            navList: [
+                {
+                    id: 1,
+                    name: '关于简逸',
+                    url: 'www.baidu.com'
+                },
+                {
+                    id: 2,
+                    name: 'About Simple',
+                    url: 'www.baidu.com'
+                },
+                {
+                    id: 3,
+                    name: '服务条款',
+                    url: 'www.baidu.com'
+                },
+                {
+                    id: 4,
+                    name: '用户服务协议',
+                    url: 'www.baidu.com'
+                },
+                {
+                    id: 5,
+                    name: '隐私政策',
+                    url: 'www.baidu.com'
+                },
+                {
+                    id: 6,
+                    name: '权利声明',
+                    url: 'www.baidu.com'
+                },
+                {
+                    id: 7,
+                    name: '简逸招聘',
+                    url: 'www.baidu.com'
+                },
+                {
+                    id: 8,
+                    name: '客服中心',
+                    url: 'www.baidu.com'
+                },
+                {
+                    id: 9,
+                    name: '网站导航',
+                    url: 'www.baidu.com'
+                }
+            ],
             currentLoop: 0,
             loopList: [
                 {
@@ -318,30 +419,11 @@ export default {
             recomSongPage: 0,
             currentRecomType: 0,
             newAlbumList: [],
-            newAlbumType: [
-                {
-                    type: 1,
-                    name: '内地'
-                },{
-                    type: 2,
-                    name: '港台'
-                },{
-                    type: 3,
-                    name: '欧美'
-                },{
-                    type: 4,
-                    name: '韩国'
-                },{
-                    type: 5,
-                    name: '日本'
-                },{
-                    type: 6,
-                    name: '其它'
-                }
-            ],
+            newAlbumType: [],
             currentNewAlbumType: 1,
             currentNewAlbumIdx: 0,
-            currentNewAlbumPage: 0
+            currentNewAlbumPage: 0,
+            rankingList: [{toplist: []}]
         }
     },
     methods: {
@@ -606,7 +688,10 @@ export default {
                     }
                     this.newAlbumList[parseInt(index / 10)].push(item)
                 })
+                this.newAlbumType = new_album_tag.data.area
                 this.currentNewAlbumPage = this.newAlbumList.length
+                this.rankingList = toplist.data.group
+
                 console.log(this.newAlbumList, '新碟推荐数据')
             })
         },
@@ -1269,6 +1354,184 @@ export default {
                         }
                     }
                 }
+            }
+        }
+        >.ranking-module{
+            height: 684px;
+            padding: 16px 0 92px 0;
+            >.ranking-info {
+                width: 1240px;
+                margin: 0 auto;
+                >.ranking-title{
+                    font-size: 32px;
+                    text-align: center;
+                    margin: 12px 0 22px 0;
+                    letter-spacing: 10px;
+                }
+                >.ranking-list{
+                    display: flex;
+                    width: 100%;
+                    justify-content: space-between;
+                    flex-flow: nowrap row;
+                    color: #FFF;
+                    >.ranking-card{
+                        width: 224px;
+                        height: 500px;
+                        background-color: #FFF;
+                        background-repeat: no-repeat;
+                        background-size: cover;
+                        background-image: url("../assets/image/bg_index_top.jpg");
+                        box-sizing: border-box;
+                        padding: 60px 24px;
+                        &:hover{
+                            .ranking-card-play{
+                                .card-play-btn{
+                                    transform: rotateX(0deg);
+                                }
+                            }
+                        }
+                        .ranking-card-title{
+                            text-align: center;
+                            >.card-title1{
+                                font-size: 24px;
+                                font-weight: 300;
+                            }
+                            >.card-title2{
+                                font-size: 28px;
+                                cursor: pointer;
+                                margin-top: 6px;
+                            }
+                        }
+                        .ranking-card-play{
+                            text-align: center;
+                            margin: 12px 0;
+                            >.card-play-btn{
+                                display: inline-block;
+                                width: 48px;
+                                height: 48px;
+                                background: transparent url(../assets/image/cover_play.png) center center/contain no-repeat;
+                                transition: transform .5s ease-in-out;
+                                transform: rotateX(87deg);
+                                cursor: pointer;
+                            }
+                        }
+                        .ranking-card-ul .ranking-card-list{
+                            height: 178px;
+                            >.card-list-item{
+                                position: relative;
+                                height: 66px;
+                                margin-top: 8px;
+                                >.num{
+                                    position: absolute;
+                                    font-style: normal;
+                                    font-family: poppin,Tahoma,Arial,\5FAE\8F6F\96C5\9ED1,sans-serif;
+                                    top: 0;
+                                    left: 0;
+                                    font-size: 14px;
+                                }
+                                >.item-txt{
+                                    width: 139px;
+                                    font-size: 14px;
+                                    line-height: 1.5;
+                                    margin-left: 14px;
+                                    >span{
+                                        display: block;
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+                                        cursor: pointer;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .card-bg-1{
+                        background-position: 0 0;
+                    }
+                    .card-bg-2{
+                        background-position: -224px 0;
+                    }
+                    .card-bg-3{
+                        background-position: -448px 0;
+                    }
+                    .card-bg-4{
+                        background-position: -672px 0;
+                    }
+                    .card-bg-5{
+                        background-position: -896px 0;
+                    }
+                }
+            }
+        }
+    }
+    .home-footer{
+        width: 100%;
+        height: 260px;
+        background-color: #333333;
+        box-sizing: border-box;
+        padding-top: 30px;
+        .footer-info{
+            width: 1240px;
+            height: 100%;
+            color: #999;
+            margin: 0 auto;
+            .footer-download{
+                position: relative;
+                height: 100px;
+                margin: 30px 0;
+                .download-title{
+                    font-size: 16px;
+                }
+                .download-ul{
+                    height: 80px;
+                    >.download-item{
+                        display: inline-block;
+                        height: 100%;
+                        vertical-align: middle;
+                        >.icon{
+                            display: inline-block;
+                            width: 37px;
+                            height: 48px;
+                            background: transparent url(../assets/image/footer.png) no-repeat;
+                        }
+                        .win-icon{
+                            background-position:  -2px 0;
+                            &:hover{
+                                background-position:  -2px -49px;
+                            }
+                        }
+                        /*
+                            win:hover y -50px
+                            mac:
+                            mac:hover
+                        */
+                    }
+                }
+            }
+            >.footer-nav{
+                width: 100%;
+                height: 16px;
+                >.footer-nav-ul{
+                    width: 100%;
+                    text-align: center;
+                    font-size: 12px;
+                    line-height: 1.5;
+                    >.nav-item{
+                        display: inline-block;
+                        >a{
+                            color: #999999;
+                            &:hover{
+                                color: #FFF;
+                                text-decoration: underline;
+                            }
+                        }
+                    }
+                }
+            }
+            >.copy-right{
+                height: 40px;
+                text-align: center  ;
+                font-size: 12px;
             }
         }
     }
