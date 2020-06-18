@@ -13,23 +13,23 @@
         <div class="section">
             <span class="module-prev" @click="changeRotation('prev')" :style="{top: prevOrNextNum + 'px',left: isShowPrevAndNext ? 0 : '-70px'}"></span>
             <span class="module-next" @click="changeRotation('next')" :style="{top: prevOrNextNum + 'px',right:isShowPrevAndNext ? 0 : '-70px'}"></span>
-<!--            <div>-->
-<!--                <ul class="music-ul">-->
-<!--                    <li class="music-item" v-for="(item,index) in musicList" v-show="index < 6" :key="item.id" :class="!!playingMusic && playingMusic.id === item.id ? 'music-on' : ''" @click="playMusic(item, 1, $event)" @dblclick="playMusic(item, 2, $event)">-->
-<!--                        <span class="cover">-->
-<!--                            <img :src="item.musicCover" width="40" height="40"/>-->
-<!--                        </span>-->
-<!--                        <span class="music-name">{{item.musicName}}</span>-->
-<!--                        <span class="music-author">{{item.musicAuthor}}</span>-->
-<!--                        <span class="music-album">{{item.musicAlbum}}</span>-->
-<!--                        <span class="music-duration">{{formatTime(item.musicDuration)}}</span>-->
-<!--                        &lt;!&ndash; <span class="music-fiery-degree">-->
-<!--                            <i class="degree-frame"></i>-->
-<!--                            <i class="degree-frame-bg" :style="{width: item.musicFieryDegree+'%'}"></i>-->
-<!--                        </span> &ndash;&gt;-->
-<!--                    </li>-->
-<!--                </ul>-->
-<!--            </div>-->
+            <div>
+                <ul class="music-ul">
+                    <li class="music-item" v-for="(item,index) in musicList" v-show="index < 6" :key="item.id" :class="!!playingMusic && playingMusic.id === item.id ? 'music-on' : ''" @click="playMusic(item, 1, $event)" @dblclick="playMusic(item, 2, $event)">
+                        <span class="cover">
+                            <img :src="item.musicCover" width="40" height="40"/>
+                        </span>
+                        <span class="music-name">{{item.musicName}}</span>
+                        <span class="music-author">{{item.musicAuthor}}</span>
+                        <span class="music-album">{{item.musicAlbum}}</span>
+                        <span class="music-duration">{{formatTime(item.musicDuration)}}</span>
+                        <!-- <span class="music-fiery-degree">
+                            <i class="degree-frame"></i>
+                            <i class="degree-frame-bg" :style="{width: item.musicFieryDegree+'%'}"></i>
+                        </span> -->
+                    </li>
+                </ul>
+            </div>
             <div class="song-recom-module module" :class="currentLookModule === 'songRecom' ? 'current-module-bg' : ''" @mouseover="showPrevAndNext('songRecom')">
                 <div class="recom-info">
                     <p class="recom-title">歌单推荐</p>
@@ -164,10 +164,26 @@
             <div class="home-footer">
                 <div class="footer-info">
                     <div class="footer-download">
-                        <p class="download-title">下载简逸音乐客户端</p>
                         <ul class="download-ul">
-                            <li class="download-item" @click="goPage('www.baidu.com')">
-                                <i class="icon win-icon"></i>
+                            <li class="download-item">
+                                <a class="download-item-link" href="https://www.google.com" target="_blank">
+                                    <i class="icon win-icon"></i>
+                                </a>
+                            </li>
+                            <li class="download-item">
+                                <a class="download-item-link" href="https://www.google.com" target="_blank">
+                                    <i class="icon mac-icon"></i>
+                                </a>
+                            </li>
+                            <li class="download-item">
+                                <a class="download-item-link" href="https://www.google.com" target="_blank">
+                                    <i class="icon android-icon"></i>
+                                </a>
+                            </li>
+                            <li class="download-item">
+                                <a class="download-item-link" href="https://www.google.com" target="_blank">
+                                    <i class="icon iphone-icon"></i>
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -179,7 +195,6 @@
                         </ul>
                     </div>
                     <div class="copy-right">
-
                         <p>Copyright © 1998 - 2020 Simple. All Rights Reserved.<br/>
                             简逸公司 版权所有 简逸网络文化经营许可证（本站纯属娱乐）</p>
                     </div>
@@ -223,47 +238,47 @@ export default {
                 {
                     id: 1,
                     name: '关于简逸',
-                    url: 'www.baidu.com'
+                    url: 'https://www.google.com'
                 },
                 {
                     id: 2,
                     name: 'About Simple',
-                    url: 'www.baidu.com'
+                    url: 'https://www.google.com'
                 },
                 {
                     id: 3,
                     name: '服务条款',
-                    url: 'www.baidu.com'
+                    url: 'https://www.google.com'
                 },
                 {
                     id: 4,
                     name: '用户服务协议',
-                    url: 'www.baidu.com'
+                    url: 'https://www.google.com'
                 },
                 {
                     id: 5,
                     name: '隐私政策',
-                    url: 'www.baidu.com'
+                    url: 'https://www.google.com'
                 },
                 {
                     id: 6,
                     name: '权利声明',
-                    url: 'www.baidu.com'
+                    url: 'https://www.google.com'
                 },
                 {
                     id: 7,
                     name: '简逸招聘',
-                    url: 'www.baidu.com'
+                    url: 'https://www.google.com'
                 },
                 {
                     id: 8,
                     name: '客服中心',
-                    url: 'www.baidu.com'
+                    url: 'https://www.google.com'
                 },
                 {
                     id: 9,
                     name: '网站导航',
-                    url: 'www.baidu.com'
+                    url: 'https://www.google.com'
                 }
             ],
             currentLoop: 0,
@@ -1469,11 +1484,12 @@ export default {
         }
     }
     .home-footer{
+        position: relative;
         width: 100%;
-        height: 260px;
+        height: 220px;
         background-color: #333333;
         box-sizing: border-box;
-        padding-top: 30px;
+        padding-top: 60px;
         .footer-info{
             width: 1240px;
             height: 100%;
@@ -1482,26 +1498,53 @@ export default {
             .footer-download{
                 position: relative;
                 height: 100px;
-                margin: 30px 0;
+                text-align: center;
                 .download-title{
+                    display: inline-block;
                     font-size: 16px;
+                    vertical-align: top;
                 }
                 .download-ul{
+                    display: inline-block;
                     height: 80px;
                     >.download-item{
                         display: inline-block;
                         height: 100%;
                         vertical-align: middle;
-                        >.icon{
-                            display: inline-block;
-                            width: 37px;
-                            height: 48px;
-                            background: transparent url(../assets/image/footer.png) no-repeat;
-                        }
-                        .win-icon{
-                            background-position:  -2px 0;
-                            &:hover{
-                                background-position:  -2px -49px;
+                        >.download-item-link{
+                            margin-right: 22px;
+                            >.icon{
+                                display: inline-block;
+                                height: 48px;
+                                background: transparent url(../assets/image/footer.png) no-repeat;
+                            }
+                            .win-icon{
+                                width: 37px;
+                                background-position:  -2px 0;
+                                &:hover{
+                                    background-position:  -2px -49px;
+                                }
+                            }
+                            .mac-icon{
+                                width: 46px;
+                                background-position:  -92px 0;
+                                &:hover{
+                                    background-position:  -92px -49px;
+                                }
+                            }
+                            .android-icon{
+                                width: 37px;
+                                background-position:  -190px 0;
+                                &:hover{
+                                    background-position:  -190px -49px;
+                                }
+                            }
+                            .iphone-icon{
+                                width: 37px;
+                                background-position:  -277px 0;
+                                &:hover{
+                                    background-position:  -277px -49px;
+                                }
                             }
                         }
                         /*
