@@ -13,23 +13,23 @@
         <div class="section">
             <span class="module-prev" @click="changeRotation('prev')" :style="{top: prevOrNextNum + 'px',left: isShowPrevAndNext ? 0 : '-70px'}"></span>
             <span class="module-next" @click="changeRotation('next')" :style="{top: prevOrNextNum + 'px',right:isShowPrevAndNext ? 0 : '-70px'}"></span>
-            <div>
-                <ul class="music-ul">
-                    <li class="music-item" v-for="(item,index) in musicList" v-show="index < 6" :key="item.id" :class="!!playingMusic && playingMusic.id === item.id ? 'music-on' : ''" @click="playMusic(item, 1, $event)" @dblclick="playMusic(item, 2, $event)">
-                        <span class="cover">
-                            <img :src="item.musicCover" width="40" height="40"/>
-                        </span>
-                        <span class="music-name">{{item.musicName}}</span>
-                        <span class="music-author">{{item.musicAuthor}}</span>
-                        <span class="music-album">{{item.musicAlbum}}</span>
-                        <span class="music-duration">{{formatTime(item.musicDuration)}}</span>
-                        <!-- <span class="music-fiery-degree">
-                            <i class="degree-frame"></i>
-                            <i class="degree-frame-bg" :style="{width: item.musicFieryDegree+'%'}"></i>
-                        </span> -->
-                    </li>
-                </ul>
-            </div>
+<!--            <div>-->
+<!--                <ul class="music-ul">-->
+<!--                    <li class="music-item" v-for="(item,index) in musicList" v-show="index < 6" :key="item.id" :class="!!playingMusic && playingMusic.id === item.id ? 'music-on' : ''" @click="playMusic(item, 1, $event)" @dblclick="playMusic(item, 2, $event)">-->
+<!--                        <span class="cover">-->
+<!--                            <img :src="item.musicCover" width="40" height="40"/>-->
+<!--                        </span>-->
+<!--                        <span class="music-name">{{item.musicName}}</span>-->
+<!--                        <span class="music-author">{{item.musicAuthor}}</span>-->
+<!--                        <span class="music-album">{{item.musicAlbum}}</span>-->
+<!--                        <span class="music-duration">{{formatTime(item.musicDuration)}}</span>-->
+<!--                        &lt;!&ndash; <span class="music-fiery-degree">-->
+<!--                            <i class="degree-frame"></i>-->
+<!--                            <i class="degree-frame-bg" :style="{width: item.musicFieryDegree+'%'}"></i>-->
+<!--                        </span> &ndash;&gt;-->
+<!--                    </li>-->
+<!--                </ul>-->
+<!--            </div>-->
             <div class="song-recom-module module" :class="currentLookModule === 'songRecom' ? 'current-module-bg' : ''" @mouseover="showPrevAndNext('songRecom')">
                 <div class="recom-info">
                     <p class="recom-title">歌单推荐</p>
@@ -78,8 +78,7 @@
             <div class="mv-module module" :class="currentLookModule === 'mv' ? 'current-module-bg' : ''" @mouseover="showPrevAndNext('mv')">
                 <div class="mv-title">
                     <p class="title">
-                        <span>M</span>
-                        <span style="margin-left: 18px;">V</span>
+                        MV
                     </p>
                     <ul class="mv-type">
                         <li v-for="item in mvType" :key="item.id" :class="currentMVType === item.val ? 'on' : ''" @click="changeMVByType(item.val)">{{item.text}}</li>
@@ -1166,6 +1165,7 @@ export default {
                 .title{
                     font-size: 32px;
                     text-align: center;
+                    letter-spacing: 10px;
                 }
                 .mv-type{
                     margin: 22px 0;
